@@ -8,13 +8,17 @@ export default new Vuex.Store({
     GTFSmap:new Map(),//(agency.txt,[[agency_id,agency_name,agency_url,agency_timezone],
                       //              [DTA,Demo Transit Authority,http://google.com,America/Los_Angeles]...])
     filenames:[],
+    zipsize:0,
     saved:false,
   },
 
   getters:{
-  
-    //input:filename   attributtype 
-    //output:a Array of all the value of this Type 
+
+      /**
+     * @param {*} filename 
+     * @param {*} attributtype
+     * @returns a Array of all the value of this Type 
+     */
     getallAttribut:(state)=>(filename,attributtype)=>{
       var filearray=state.GTFSmap.get(filename);
       var fileAttributeType=filearray[0].split(',');
@@ -34,9 +38,16 @@ export default new Vuex.Store({
       }
       return Array.from(result);         
     },
+    
 
-    //input:filename,UIDvalue,UIDtype,attributtype
-    //output: the value of this Type with UIDvalue
+
+    /**
+     * @param {*} filename 
+     * @param {*} UIDtype 
+     * @param {*} UIDvalue
+     * @param {*} attributtype
+     * @returns the value of this Type with UIDvalue
+     */
     getAttributeValue:(state)=>(filename,UIDtype,UIDvalue,attributtype)=>{
       var filearray=state.GTFSmap.get(filename);
       var fileAttributeType=filearray[0].split(',');
@@ -64,6 +75,8 @@ export default new Vuex.Store({
       //return Array.from(result);     
     },
 
+
+
   },
 
   mutations: {   
@@ -74,15 +87,31 @@ export default new Vuex.Store({
       //   console.log(stringFile[i]);
       // }
       state.GTFSmap.set(data[0],stringFile);     
-      state.filenames.push(data[0]);      
+      state.filenames.push(data[0]);   
+
+      if(state.zipsize!=0){
+        if(state.GTFSmap.size==state.zipsize){
+          state.saved=true;
+        }
+      }   
     },
 
     setSaved(state,b){
-      state.saved=b;
+      Vue.set(state,'saved',b);
+      
+    },
+
+    setZipsize(state,size){
+      state.zipsize=size;
+    },
+
+    addZipsize(state){
+      state.zipsize++;
     },
 
     //reset GTFS Data
     reset(state){
+      state.zipsize=0;
       state.GTFSmap=new Map();
       state.filenames=[];
       state.saved=false;
@@ -90,6 +119,13 @@ export default new Vuex.Store({
 
     //input:filename,UIDvalue,UIDtype,attributtype
     //change the attribute value,which has UIDvalue and in attributtype
+    /**
+     * @param {*} filename 
+     * @param {*} UIDtype 
+     * @param {*} UIDvalue
+     * @param {*} attributtype
+     * @param {*} attributeValue
+     */
     setAttributeValue(state,[filename,UIDtype,UIDvalue,attributtype,attributeValue]){
       var filearray=state.GTFSmap.get(filename);
       var fileAttributeType=filearray[0].split(',');
@@ -126,15 +162,20 @@ export default new Vuex.Store({
 
 
 
+
+
   },
   actions: {
-    //在这里定义延时的调用mutations方法的方法  一步操作 大概用不上
-    increment(context) {
-      setTimeout(()=>{
-        context.commit('add')
-      },1000)      
-    }
-  },
+    setSavedAsync(context,b) {
+      setTimeout(() => {
+        context.commit('setSaved',b)
+      }, 1000)},
+  
+    setZipsizeAsync(context,size) {
+      setTimeout(() => {
+        context.commit('setZipsize',size)
+      }, 1000)},
+},
   modules: {
   }
 })

@@ -14,7 +14,7 @@
               accept=".zip"
               :limit="1"
               :before-upload="importUpload">
-              <el-button  type="primary">Click to upload zip file<i class="el-icon-upload el-icon--right"></i></el-button>
+              <el-button  type="primary" v-loading.fullscreen.lock="fullscreenLoading">Click to upload zip file<i class="el-icon-upload el-icon--right"></i></el-button>
             </el-upload>
           </el-col> 
          
@@ -59,24 +59,28 @@ import JsZip from 'jszip';
 
 export default {
   computed: {
-    ...mapState(['GTFSmap','filenames','saved']) //improt share variable from store
+    ...mapState(['GTFSmap','filenames','saved','zipsize']), //improt share variable from store
+
   },
   
   data(){
       return{
           drawer: false,
           //saved:false,
+          fullscreenLoading:false,
+         
       }  
   },
 
   methods:{
     //improt functions from store
-    ...mapMutations(['storeFile','reset','setSaved']), 
-    ...mapGetters(['getFile']),
+    ...mapMutations(['storeFile','reset','setSaved','setZipsize','addZipsize']), 
 
    //open the zip and save all the txt ducument in to the store
     importUpload(zipfile){
+      this.fullscreenLoading = true;
       this.reset();
+      var size=0;
       let new_zip = new JsZip();
       new_zip.loadAsync(zipfile).then((zip) => { // read zip
         for (let key in zip.files){
@@ -85,26 +89,33 @@ export default {
               let txtfile="";
               let base=zip.file(zip.files[key].name).async('string');
               base.then(
-                res=>{txtfile+=res;
-                //console.log(txtfile);   
+                res=>{txtfile+=res;  
                 this.$store.commit('storeFile',[txtName,txtfile]);
               });  
-              //console.log(this.GTFSmap.get(key));      
+  
               // this.$store.commit('storeFile',[txtName,txtfile]);   
+              this.addZipsize();
+              
             }
             else{
               //if it is not a txt file
               alert("You have a wrong GTFS Form")
-            }
+            }           
         }
       });
-      this.setSaved(true);
+      
+      //this.setZipsize(size); 
+      //this.setSaved(true);
+      //this.$store.dispatch('setZipsizeAsync',size);
+      //console.log("zipsize:"+this.zipsize);
+      //this.$store.dispatch('setSavedAsync',true);
+      
       return false;
     },
 
 ////create a zip file and download
     exportDownload(){
-    //create a zip file
+      //create a zip file
       let zip = new JsZip();
       var content;
       for(var key of this.GTFSmap.keys()){
@@ -137,6 +148,16 @@ export default {
     }
  
   },
+  watch:{
+    saved(val){     
+      if(val){  
+        setTimeout(() => {
+          this.fullscreenLoading = false;
+        }, 1000);
+      }  
+      
+    }
+  }
     
     
 }

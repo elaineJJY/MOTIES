@@ -18,7 +18,7 @@
 //这里可以写这个页面里搭载什么组件
 import documentMenu from '@/components/document-menu'
 import tripTable from '@/components/trip-table'
-
+import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
 export default {
   name: 'Home',
   components: {
@@ -27,14 +27,21 @@ export default {
   },
   data(){
     return{
-      activeName: 'trip'
+      activeName: 'trip',
+      loading:false,
     }    
   },
+   computed:{
+      ...mapState(['GTFSmap','filenames','saved']), //improt share variable from store
+        },
   methods: {
     handleSelect(key, keyPath) {
       console.log(key, keyPath);
     },
   },
+  watch:{
+    
+  }
 }
 </script>
 
