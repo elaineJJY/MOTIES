@@ -10,6 +10,7 @@ export default new Vuex.Store({
     filenames:[],
     zipsize:0,
     saved:false,
+    
   },
 
   getters:{
@@ -46,7 +47,7 @@ export default new Vuex.Store({
      * @param {*} UIDtype 
      * @param {*} UIDvalue
      * @param {*} attributtype
-     * @returns the value of this Type with UIDvalue
+     * @returns the value of this Type with UIDvalue, if the file does not have this AttributeType, than return""
      */
     getAttributeValue:(state)=>(filename,UIDtype,UIDvalue,attributtype)=>{
       var filearray=state.GTFSmap.get(filename);
@@ -60,22 +61,53 @@ export default new Vuex.Store({
           attribute_position=i;
         }
         if(fileAttributeType[i]==UIDtype){
-          found=true;
           uid_position=i;
         }
       }      
       //var result=new Set();
-      for(var j =1;j<filearray.length;j++){
-        var temp=filearray[j].split(',');
-        if(temp[uid_position]==UIDvalue){
-          //result.add(temp[attribute_position]);
-          return temp[attribute_position];
-        }        
+      if(found){
+        for(var j =1;j<filearray.length;j++){
+          var temp=filearray[j].split(',');
+          if(temp[uid_position]==UIDvalue){
+            //result.add(temp[attribute_position]);
+            return temp[attribute_position];
+          }        
+        }
       }
-      //return Array.from(result);     
+      return "";     
     },
 
-
+    /**
+     * @param {*} serviceID 
+     * @param {*} exception_type
+     * @returns the array of this Type with serviceID
+     */
+    getDateArray:(state)=>(serviceID,exception_type)=>{
+      var filearray=state.GTFSmap.get("calendar_dates.txt");
+      var result=[];
+      var indexServiceID;
+      var indexException;
+      var indexDate;
+      var temp=filearray[0].split(',');
+      for(var j =0;j<temp.length;j++){
+        if(temp[j]=="service_id"){
+          indexServiceID=j;
+        }
+        else if(temp[j]=="date"){
+          indexDate=j;
+        }
+        else{
+          indexException=j;
+        }
+      }
+      for(j =1;j<filearray.length;j++){
+        temp=filearray[j].split(',');
+        if(temp[indexServiceID]==serviceID&&temp[indexException]==exception_type){
+          result.push(temp[indexDate]);
+        }        
+      }
+      return result;     
+    },
 
   },
 
@@ -108,6 +140,8 @@ export default new Vuex.Store({
     addZipsize(state){
       state.zipsize++;
     },
+
+    
 
     //reset GTFS Data
     reset(state){
