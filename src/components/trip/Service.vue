@@ -9,7 +9,7 @@
                     <el-form-item label="Service ID">
                         <el-select 
                         v-model="form.serviceID" 
-                        placeholder="select a Route" 
+                        placeholder="select a Service" 
                         filterable                       
                         @change="refresh_service">
                             <el-option
@@ -94,13 +94,11 @@
 <script>
 import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
 export default {
-    props:['form'],
+    props:['tripform'],
     
     data(){
         return{
-            form:this.form,
-            trip_id_list:[],
-            service_list:[],
+            form:this.tripform,
             range: ["20200101","20200202"],
             exception_type1:[], //the imported specified date , will never be changed later   the edited array is in attrs
             exception_type2:[],
@@ -131,7 +129,7 @@ export default {
     },
     
     computed:{
-    ...mapState(['GTFSmap','filenames','saved']), //improt share variable from store
+    ...mapState(['GTFSmap','filenames','saved','trip_id_list','service_list']), //improt share variable from store
     
         weekarray(){
             var weekarray=new Array();
@@ -165,7 +163,7 @@ export default {
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"saturday")); 
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"sunday")); 
             this.week=week;
-            setTimeout(this.refreshCalender,100);
+            setTimeout(this.refreshCalender,200);
             //this.refreshCalender();               
         },
 
@@ -288,12 +286,7 @@ export default {
         saved(val){   
                 const calendar = this.$refs.calendar;                
                 calendar.move({ month:1, year: this.range[0].substring(0,4)})            
-                if(val){  
-                    setTimeout(() => {
-                        this.trip_id_list=this.$store.getters.getallAttribut("trips.txt","trip_id");                    
-                        this.service_list=this.$store.getters.getallAttribut("calendar.txt","service_id");
-                    }, 100)  
-                }                  
+                                 
                 
         },
         range(){

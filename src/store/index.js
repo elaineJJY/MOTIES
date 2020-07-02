@@ -10,6 +10,9 @@ export default new Vuex.Store({
     filenames:[],
     zipsize:0,
     saved:false,
+    trip_id_list:[],
+    route_id_list:[],
+    service_list:[],
     
   },
 
@@ -149,6 +152,17 @@ export default new Vuex.Store({
       state.GTFSmap=new Map();
       state.filenames=[];
       state.saved=false;
+    },
+
+
+    setTrip_id_list(state,list){
+      state.trip_id_list=list;
+    },
+    setRoute_id_list(state,list){
+      state.route_id_list=list;
+    },
+    setService_list(state,list){
+      state.service_list=list;
     },
 
     //input:filename,UIDvalue,UIDtype,attributtype
