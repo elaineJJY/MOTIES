@@ -1,7 +1,8 @@
 <template>
     <div>
+        
         <el-row :gutter="20">
-
+            
             <!-- select a existed Trip to edit -->
             <el-col :span="6" :offset="15">
                 <div class="grid-content bg-purple">
@@ -24,131 +25,149 @@
 
             <el-col :span="3">
                 <div class="grid-content bg-purple">
-                    <el-button type="info" plain>Creat a Trip</el-button>
+                    <el-button type="danger" plain>Creat a Trip</el-button>
                 </div>
             </el-col>
         </el-row>
 
+    <br>
+
+    <el-tabs type="border-card">
+        <el-tab-pane label="Trip">
+            
+                <h2>Trip</h2>
+                <el-form :model="form" label-width="160px">
+                    <el-row :gutter="1">
+
+                        <el-col :span="6">
+                            <el-form-item label="Trip ID">
+                                <el-input v-model="form.tripID">{{form.tripID}}</el-input>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="7">
+                            <el-form-item label="Short Name">
+                                <el-input v-model="form.shortName">{{form.shortName}}</el-input>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="9">
+                            <el-form-item label="Headsign">
+                                <el-input v-model="form.headSign">{{form.headSign}}</el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10">
+                        <el-col :span="8">
+                            <el-form-item label="Block ID">
+                                <el-input  v-model="form.blockID">{{form.blockID}}</el-input>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="10">
+                            <el-form-item label="Direction">
+                                ! need change
+                                <el-select v-model="form.direction" placeholder="-">
+                                    <el-option label="1" value="shanghai"></el-option>
+                                    <el-option label="2" value="beijing"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10">
+                        <el-col :span="10">
+                            <el-form-item label="Wheelchair accessible">
+                                <el-radio-group v-model="form.wheelchair">
+                                    <el-radio border label="1">Yes</el-radio>
+                                    <el-radio border label="0o">No</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="10">
+                            <el-form-item label="Bikes allowed">
+                                <el-radio-group v-model="form.bikes">
+                                    <el-radio border label="1">Yes</el-radio>
+                                    <el-radio border label="0o">No</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row>
+                        <!-- select a existed Route -->
+                        <el-col :span="9" >
+                            <el-form-item label="Route ID">
+                                <el-select 
+                                v-model="form.routeID" 
+                                placeholder="select a Route" 
+                                filterable>
+                                    <el-option
+                                    v-for="item in route_id_list"
+                                    :key="item"
+                                    :value="item">
+                                    {{item}}
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+
+                        <!-- select a existed service -->
+                        <el-col :span="9" >
+                            <el-form-item label="Service ID">
+                                <el-select 
+                                v-model="form.serviceID" 
+                                placeholder="select a Service" 
+                                filterable>
+                                    <el-option
+                                    v-for="item in service_list"
+                                    :key="item"
+                                    :value="item">
+                                    {{item}}
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
 
 
-        <h3>Trip</h3>
-        <el-form :model="form" label-width="160px">
-            <el-row :gutter="1">
+                    </el-row>
+                </el-form>
+                
+                <el-row>
+                    <el-col :offset="20">
+                        <el-button type="success" round @click="onSubmit">Submit</el-button>
+                    </el-col>
+                </el-row>
+        </el-tab-pane>
 
-                <el-col :span="6">
-                    <el-form-item label="Trip ID">
-                        <el-input v-model="form.tripID">{{form.tripID}}</el-input>
-                    </el-form-item>
-                </el-col>
+        <el-tab-pane label="Route">
+            <Route 
+                ref="route" 
+                :tripform='form'
+                :trip_list='trip_id_list'
+                :route_list='route_id_list'>
+            </Route>
+        </el-tab-pane>
 
-                <el-col :span="7">
-                    <el-form-item label="Short Name">
-                        <el-input v-model="form.shortName">{{form.shortName}}</el-input>
-                    </el-form-item>
-                </el-col>
+        <el-tab-pane label="Service">
+            <Service 
+                ref="service" 
+                :tripform='form' 
+                :trip_list='trip_id_list'
+                :service_list_fromtrip='service_list'>
+            </Service>
+        </el-tab-pane>
+        <el-tab-pane label="Stop">Stop</el-tab-pane>
+    </el-tabs>
 
-                <el-col :span="9">
-                    <el-form-item label="Headsign">
-                        <el-input v-model="form.headSign">{{form.headSign}}</el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <el-row :gutter="100">
-                <el-col :span="12">
-                    <el-form-item label="Block ID">
-                        <el-input  v-model="form.blockID">{{form.blockID}}</el-input>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="12">
-                    <el-form-item label="Direction">
-                        这个要再改
-                        <el-select v-model="form.direction" placeholder="-">
-                            <el-option label="1" value="shanghai"></el-option>
-                            <el-option label="2" value="beijing"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <el-row :gutter="20">
-                <el-col :span="10">
-                    <el-form-item label="Wheelchair accessible">
-                        <el-radio-group v-model="form.wheelchair">
-                            <el-radio border label="1">Yes</el-radio>
-                            <el-radio border label="0o">No</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="10">
-                    <el-form-item label="Bikes allowed">
-                        <el-radio-group v-model="form.bikes">
-                            <el-radio border label="1">Yes</el-radio>
-                            <el-radio border label="0o">No</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <el-row>
-                <!-- select a existed Route -->
-                <el-col :span="9" >
-                    <el-form-item label="Route ID">
-                        <el-select 
-                        v-model="form.routeID" 
-                        placeholder="select a Route" 
-                        filterable>
-                            <el-option
-                            v-for="item in route_id_list"
-                            :key="item"
-                            :value="item">
-                            {{item}}
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
-                <!-- select a existed service -->
-                <el-col :span="9" >
-                    <el-form-item label="Service ID">
-                        <el-select 
-                        v-model="form.serviceID" 
-                        placeholder="select a Service" 
-                        filterable>
-                            <el-option
-                            v-for="item in service_list"
-                            :key="item"
-                            :value="item">
-                            {{item}}
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
+  
+    <button @click="test">test</button>
 
 
-            </el-row>
-        </el-form>
 
-
-             
-        <el-button type="success" round @click="onSubmit">Submit</el-button>
-        <button @click="test">测试</button>
-
-        <Route 
-            ref="route" 
-            :tripform='form'
-            :trip_list='trip_id_list'
-            :route_list='route_id_list'>
-        </Route>
-
-        <Service 
-            ref="service" 
-            :tripform='form' 
-            :trip_list='trip_id_list'
-            :service_list_fromtrip='service_list'>
-        </Service>
+        
         
     </div>
 </template>
@@ -157,10 +176,12 @@
 import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
 import Service from '@/components/trip/Service'
 import Route from '@/components/trip/Route'
+import Menu from '@/components/menu'
     export default {
         components:{
             Service,
             Route,
+            Menu,
         },
         data(){
             return{
@@ -245,7 +266,6 @@ import Route from '@/components/trip/Route'
 </script>
 
 <style scoped>
-
 
 
 

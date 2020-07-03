@@ -1,15 +1,14 @@
 
 <template>
   <div>
-    <document-menu></document-menu>
-    <br>
-    <el-tabs v-model="activeName">
+    
+    <!-- <el-tabs v-model="activeName">
       <el-tab-pane label="Station" name="station">Station</el-tab-pane>
       <el-tab-pane label="Trip" name="trip">
       <trip-table></trip-table>
       </el-tab-pane>      
       <el-tab-pane label="Picker Popups" name="pp">Picker Popups</el-tab-pane>
-    </el-tabs>
+    </el-tabs> -->
 
 
   </div>

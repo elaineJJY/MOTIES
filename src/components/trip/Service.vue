@@ -24,7 +24,7 @@
 
                 <el-col :span="3">
                     <div class="grid-content bg-purple">
-                        <el-button type="info" plain>Creat a Service</el-button>
+                        <el-button type="danger" plain>Creat a Service</el-button>
                     </div>
                 </el-col>
             
@@ -55,7 +55,7 @@
 
             <!-- select weekdays -->
             <el-row>
-                <el-col :offset="6"  :span="12">                  
+                <el-col :offset="2"  :span="14">                  
                     <el-checkbox label="Mon" v-model="week[0]" true-label="1" false-label="0"></el-checkbox>
                     <el-checkbox label="Tue" v-model="week[1]" true-label="1" false-label="0"></el-checkbox>
                     <el-checkbox label="Wed" v-model="week[2]" true-label="1" false-label="0"></el-checkbox>
@@ -74,7 +74,6 @@
             <br>
         
             <!-- Calender -->
-        
             <v-calendar
             class="vc-container "
             :attributes="attrs"
@@ -86,8 +85,13 @@
             :columns="$screens({ default: 4})"                  
             />
 
-           
         </el-form>
+
+        <el-row>
+            <el-col :offset="20">
+                <el-button type="success" round @click="onSubmit">Submit</el-button>
+            </el-col>
+        </el-row>
   </div>
 </template>
 
@@ -279,7 +283,11 @@ export default {
             this.attrs=attrs;
             this.openHighlight();
             
-        }
+        },
+
+        onSubmit(){
+
+        },
 
     },
     watch:{
