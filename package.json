@@ -11,13 +11,17 @@
     "element-ui": "^2.13.2",
     "jszip": "^3.5.0",
     "sass-loader": "^8.0.2",
+    "sortablejs": "^1.10.2",
     "tailwindcss": "^1.4.6",
     "v-calendar": "^1.0.0-beta.23",
     "vue": "^2.6.11",
     "vue-functional-calendar": "^2.8.85",
     "vue-router": "^3.2.0",
+    "vuedraggable": "^2.24.0",
     "vuejs-datepicker": "^0.9.9",
-    "vuex": "^3.4.0"
+    "vuex": "^3.4.0",
+    "vxe-table": "^2.9.14",
+    "xe-utils": "^2.6.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.4.0",

@@ -1,8 +1,6 @@
 <template>
   <div id="app">
-
-    <router-view></router-view>
-
+    <Menu></Menu>
   </div>
 </template>
 
@@ -11,14 +9,14 @@
 
 <script>
 //components
-import documentMenu from './components/document-menu'
-
+import Menu from './components/menu'
 export default{
   methods:{
   },
 
   components:{
-    documentMenu,
+    
+    Menu,
   },
 }
 </script>

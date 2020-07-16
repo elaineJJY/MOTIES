@@ -3,11 +3,11 @@
 
         <el-row :gutter="30">
           
-          <!--title-->
+          <!-- title -->
           <el-col :span="6" class="title">GTFS Editor</el-col>
 
           <!--Uploade-->
-          <el-col :span="4" :offset="6">
+          <el-col :span="6" :offset="4">
             <el-upload
               class="upload-demo"
               action="1"
@@ -43,12 +43,12 @@
           </el-col>
           
           <!--Export-->
-          <el-col :span="2" >
+          <el-col :offset="1" :span="2" >
             <el-button type="success" @click="exportDownload">Export</el-button>
           </el-col>
 
         </el-row>
-      
+        <el-divider></el-divider>
   </div>
 </template>
 

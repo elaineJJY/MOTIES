@@ -10,16 +10,16 @@ export default new Vuex.Store({
     filenames:[],
     zipsize:0,
     saved:false,
+    trip_id_list:[],
+    route_id_list:[],
+    service_list:[],
+    stop_id_list:[],
     
   },
 
   getters:{
 
-      /**
-     * @param {*} filename 
-     * @param {*} attributtype
-     * @returns a Array of all the value of this Type 
-     */
+     //returns a Array of all the value of this Type 
     getallAttribut:(state)=>(filename,attributtype)=>{
       var filearray=state.GTFSmap.get(filename);
       var fileAttributeType=filearray[0].split(',');
@@ -42,13 +42,8 @@ export default new Vuex.Store({
     
 
 
-    /**
-     * @param {*} filename 
-     * @param {*} UIDtype 
-     * @param {*} UIDvalue
-     * @param {*} attributtype
-     * @returns the value of this Type with UIDvalue, if the file does not have this AttributeType, than return""
-     */
+    
+     //returns the value of this Type with UIDvalue, if the file does not have this AttributeType, than return""
     getAttributeValue:(state)=>(filename,UIDtype,UIDvalue,attributtype)=>{
       var filearray=state.GTFSmap.get(filename);
       var fileAttributeType=filearray[0].split(',');
@@ -77,11 +72,38 @@ export default new Vuex.Store({
       return "";     
     },
 
-    /**
-     * @param {*} serviceID 
-     * @param {*} exception_type
-     * @returns the array of this Type with serviceID
-     */
+    //return a row with UID  
+    getRows:(state)=>(filename,UIDtype,UID)=>{
+      var filearray=state.GTFSmap.get(filename);
+      var fileAttributeType=filearray[0].split(',');
+      
+      //get position
+      var UID_position;
+      
+      for(var i in fileAttributeType){        
+        if(fileAttributeType[i]==UIDtype){
+          UID_position=i;
+        }
+      }     
+      
+      //filter the file, find out the rows with UID
+      var result=[];
+        for(var j =1;j<filearray.length;j++){
+          var temp=filearray[j].split(',');
+          if(temp[UID_position]==UID){
+            temp[fileAttributeType.length]=j; //the last element is row index
+            result.push(temp); 
+          }        
+      }
+
+      
+      return result;      
+    },
+
+  
+
+    
+     //returns the array of this Type with serviceID
     getDateArray:(state)=>(serviceID,exception_type)=>{
       var filearray=state.GTFSmap.get("calendar_dates.txt");
       var result=[];
@@ -151,32 +173,53 @@ export default new Vuex.Store({
       state.saved=false;
     },
 
+
+    setTrip_id_list(state,list){
+      state.trip_id_list=list;
+    },
+    setRoute_id_list(state,list){
+      state.route_id_list=list;
+    },
+    setService_list(state,list){
+      state.service_list=list;
+    },
+    setStop_id_list(state,list){
+      state.stop_id_list=list;
+    },
+
+    
     //input:filename,UIDvalue,UIDtype,attributtype
     //change the attribute value,which has UIDvalue and in attributtype
-    /**
-     * @param {*} filename 
-     * @param {*} UIDtype 
-     * @param {*} UIDvalue
-     * @param {*} attributtype
-     * @param {*} attributeValue
-     */
     setAttributeValue(state,[filename,UIDtype,UIDvalue,attributtype,attributeValue]){
       var filearray=state.GTFSmap.get(filename);
-      var fileAttributeType=filearray[0].split(',');
-      var found=false;
+      var fileAttributeType=filearray[0].split(','); 
+      
+      
+      //find the position of the element to change   
       var uid_position;// position of the UID
-      var attribute_position;
-      for(var i in fileAttributeType){        
-        if(fileAttributeType[i]==attributtype){
-          found=true;
+      var attribute_position=-1;
+      for(var i in fileAttributeType){      
+        if(fileAttributeType[i]==attributtype){ 
           attribute_position=i;
         }
         if(fileAttributeType[i]==UIDtype){
-          found=true;
           uid_position=i;
         }
-      }      
-      //var result=new Set();
+      }
+      
+      //if this type does not exitst and we should add it to the txt
+      var s="";
+      if(attribute_position<0){
+        fileAttributeType.push(attributtype); 
+        for(var i in fileAttributeType){
+          s+=fileAttributeType[i]+",";       
+        }
+        s=s.substring(0,s.length-1);
+        filearray[0]=s;
+        attribute_position=fileAttributeType.length-1;
+      } 
+      
+      //change the value
       var j;
       for(j =1;j<filearray.length;j++){
         var temp=filearray[j].split(',');
@@ -185,16 +228,82 @@ export default new Vuex.Store({
           break;
         }        
       }
-      var s="";
-      for(var i in temp){
+
+      //write new text
+      s="";
+      for(var i in fileAttributeType){
+        if(typeof(temp[i]) == "undefined"){
+          temp[i]="";
+        }
         s+=temp[i]+",";       
       }
+      
       s=s.substring(0,s.length-1);
       filearray[j]=s;
       state.GTFSmap.set(filename,filearray);  
     },
 
 
+    //change the attribute value by row index
+    //row:on which row it is
+    //attributename:the type of the variable to change
+    setRows(state,[filename,row,attributename,value]){
+      var filearray=state.GTFSmap.get(filename);
+      var fileAttributeType=filearray[0].split(',');
+      var index=-1;
+      for(var i in fileAttributeType){        
+        if(fileAttributeType[i]==attributename){
+          index=i;
+          break;
+        }
+      }
+      var s="";
+      
+      //if this type does not exitst in the fileAttributeType and we should add it to the first row
+      if(index<0){
+        fileAttributeType.push(attributename); 
+        for(var i in fileAttributeType){
+          s+=fileAttributeType[i]+",";       
+        }
+        s=s.substring(0,s.length-1);
+        filearray[0]=s;
+        index=fileAttributeType.length-1;
+      } 
+      
+      //change the value
+      var temp;
+      if(row>=filearray.length){ //add the new row
+        temp=new Array(fileAttributeType.length).fill("");
+      }
+      else{
+        temp=filearray[row].split(',');
+      }
+      
+      temp[index]=value;
+      
+      //array=>string
+      s="";
+      for(var i in fileAttributeType){
+        if(typeof(temp[i]) == "undefined"){
+          temp[i]="";
+        }
+        s+=temp[i]+",";       
+      }
+      s=s.substring(0,s.length-1);
+      filearray[row]=s;
+      state.GTFSmap.set(filename,filearray); 
+    },
+
+    deleteRows(state,[filename,rows]){
+      var filearray=state.GTFSmap.get(filename);
+      rows.sort().reverse();
+      
+      for(var i in rows){
+        filearray.splice(rows[i], 1);
+        
+      }
+      state.GTFSmap.set(filename,filearray);
+    }
 
 
 

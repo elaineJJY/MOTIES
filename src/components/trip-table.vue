@@ -1,7 +1,8 @@
 <template>
     <div>
+        
         <el-row :gutter="20">
-
+            
             <!-- select a existed Trip to edit -->
             <el-col :span="6" :offset="15">
                 <div class="grid-content bg-purple">
@@ -24,321 +25,166 @@
 
             <el-col :span="3">
                 <div class="grid-content bg-purple">
-                    <el-button type="info" plain>Creat a Trip</el-button>
+                    <el-button type="danger" plain>Creat a Trip</el-button>
                 </div>
             </el-col>
         </el-row>
 
+    <br>
+
+    <el-tabs type="border-card">
+        <el-tab-pane label="Trip">
+            
+                <h2>Trip</h2>
+                <el-form :model="form" label-width="160px">
+                    <el-row :gutter="1">
+
+                        <el-col :span="6">
+                            <el-form-item label="Trip ID">
+                                <el-input v-model="form.tripID">{{form.tripID}}</el-input>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="7">
+                            <el-form-item label="Short Name">
+                                <el-input v-model="form.shortName">{{form.shortName}}</el-input>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="9">
+                            <el-form-item label="Headsign">
+                                <el-input v-model="form.headSign">{{form.headSign}}</el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10">
+                        <el-col :span="8">
+                            <el-form-item label="Block ID">
+                                <el-input  v-model="form.blockID">{{form.blockID}}</el-input>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="10">
+                            <el-form-item label="Direction">
+                                ! need change
+                                <el-select v-model="form.direction" placeholder="-">
+                                    <el-option label="1" value="shanghai"></el-option>
+                                    <el-option label="2" value="beijing"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10">
+                        <el-col :span="10">
+                            <el-form-item label="Wheelchair accessible">
+                                <el-radio-group v-model="form.wheelchair">
+                                    <el-radio border label="1">Yes</el-radio>
+                                    <el-radio border label="0o">No</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+
+                        <el-col :span="10">
+                            <el-form-item label="Bikes allowed">
+                                <el-radio-group v-model="form.bikes">
+                                    <el-radio border label="1">Yes</el-radio>
+                                    <el-radio border label="0o">No</el-radio>
+                                </el-radio-group>
+                            </el-form-item>
+                        </el-col>
+                    </el-row>
+
+                    <el-row>
+                        <!-- select a existed Route -->
+                        <el-col :span="9" >
+                            <el-form-item label="Route ID">
+                                <el-select 
+                                v-model="form.routeID" 
+                                placeholder="Filter" 
+                                filterable 
+                                popper-class="optionsContainter"
+                                :filter-method="filterRoute">
+                                    <template>
+                                        <div class="optionHeader" >
+                                            <span style="float: left">ID</span>
+                                            <span style="float: left">Short Name</span>
+                                            <span style="float: left">Long Name</span>
+                                        </div>
+                                    </template>
+                                    <el-option
+                                    v-for="item in route_list"
+                                    :key="item"
+                                    :value="item">
+                                    
+                                    <span style="float: left">{{item}}</span>
+                                    <span style="float: left">{{$store.getters.getAttributeValue('routes.txt','route_id',item,'route_short_name')}}</span>
+                                    <span style="float: left">{{$store.getters.getAttributeValue('routes.txt','route_id',item,'route_long_name')}}</span>
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+
+                        <!-- select a existed service -->
+                        <el-col :span="9" >
+                            <el-form-item label="Service ID">
+                                <el-select 
+                                v-model="form.serviceID" 
+                                placeholder="select a Service" 
+                                filterable
+                                style="width:100%">
+                                    <el-option
+                                    v-for="item in service_list"
+                                    :key="item"
+                                    :value="item">
+                                    {{item}}
+                                    </el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
 
 
-        <h3>Trip</h3>
-        <el-form :model="form" label-width="160px">
-            <el-row :gutter="1">
-
-                <el-col :span="6">
-                    <el-form-item label="Trip ID">
-                        <el-input v-model="form.tripID">{{form.tripID}}</el-input>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="7">
-                    <el-form-item label="Short Name">
-                        <el-input v-model="form.shortName">{{form.shortName}}</el-input>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="9">
-                    <el-form-item label="Headsign">
-                        <el-input v-model="form.headSign">{{form.headSign}}</el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <el-row :gutter="100">
-                <el-col :span="12">
-                    <el-form-item label="Block ID">
-                        <el-input  v-model="form.blockID">{{form.blockID}}</el-input>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="12">
-                    <el-form-item label="Direction">
-                        这个要再改
-                        <el-select v-model="form.direction" placeholder="-">
-                            <el-option label="1" value="shanghai"></el-option>
-                            <el-option label="2" value="beijing"></el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            <el-row :gutter="20">
-                <el-col :span="10">
-                    <el-form-item label="Wheelchair accessible">
-                        <el-radio-group v-model="form.wheelchair">
-                            <el-radio border label="1">Yes</el-radio>
-                            <el-radio border label="0o">No</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="10">
-                    <el-form-item label="Bikes allowed">
-                        <el-radio-group v-model="form.bikes">
-                            <el-radio border label="1">Yes</el-radio>
-                            <el-radio border label="0o">No</el-radio>
-                        </el-radio-group>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-        </el-form>
-
-
-        <h3>Route</h3>
-        <el-form :model="route_form" label-width="160px">
-            <el-row :gutter="30">
+                    </el-row>
+                </el-form>
                 
-                <!-- select a existed Route to edit -->
-                <el-col :span="7" >
-                    <el-form-item label="Route ID">
-                        <el-select 
-                        v-model="form.routeID" 
-                        placeholder="select a Route" 
-                        filterable                       
-                        @change="refresh_route">
-                            <el-option
-                            v-for="item in route_id_list"
-                            :key="item"
-                            :value="item">
-                            {{item}}
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
+                <el-row>
+                    <el-col :offset="20">
+                        <el-button type="success" round @click="onSubmit">Submit</el-button>
+                    </el-col>
+                </el-row>
+        </el-tab-pane>
 
-                
+        <el-tab-pane label="Route">
+            <Route 
+                ref="route" 
+                :tripform='form'
+                @refresh="refresh_trip">
+            </Route>
+        </el-tab-pane>
 
-                <el-col :span="3">
-                    <div class="grid-content bg-purple">
-                        <el-button type="info" plain>Creat a Route</el-button>
-                    </div>
-                </el-col>
+        <el-tab-pane label="Service Days">
+            <Service 
+                ref="service" 
+                :tripform='form' >
+            </Service>
+        </el-tab-pane>
 
+        <el-tab-pane label="Stop">
+            <Stop
+                ref="stop" 
+                :tripform='form'>
+            </Stop>
+        </el-tab-pane>
 
-            </el-row>
-           
-
-            <el-row :gutter="2"> 
-
-                <!-- select a existed Agency -->
-                <el-col :span="9" >
-                    <el-form-item label="Agency">
-                        <el-select 
-                        v-model="route_form.agency_id" 
-                        placeholder="select a Agency" >
-                            <el-option
-                            v-for="item in agency_list"
-                            :key="item"
-                            :value="item">
-                            <span style="float: left">{{item}}</span>
-                            <span style="float: right; color: #8492a6; font-size: 13px">{{$store.getters.getAttributeValue("agency.txt","agency_id",item,"agency_name")}}</span>
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="6">
-                    <el-form-item label="Short Name">
-                        <el-input v-model="route_form.shortName">{{route_form.longName}}</el-input>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="8">
-                    <el-form-item label="Long Name">
-                        <el-input v-model="route_form.longName">{{route_form.longName}}</el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-
-            
-
-            <el-row :gutter="1">
-                <el-col :span="8">
-                    <el-form-item label="Type">
-                        <el-select 
-                            v-model="route_form.type" 
-                            placeholder="select or search"
-                            filterable
-                            :filter-method="filterMap">
-                                <el-option
-                                v-for="key in type_map.keys()"
-                                :key="key"
-                                :value="key">
-                                {{key}}.{{type_map.get(key)}}
-                                </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="6">
-                    <el-form-item label="Sort Order">
-                        <el-input v-model="route_form.sort_order"></el-input>
-                    </el-form-item>
-
-                </el-col>
-            
-                <el-col :span="3" :offset="1">
-                    <el-form-item label="Route Color">
-                        <el-color-picker v-model="route_form.route_color"></el-color-picker>
-                    </el-form-item>    
-                </el-col>   
-
-                <el-col :span="4" :offset="1">
-                    <el-form-item label="Route Text Color">
-                        <el-color-picker v-model="route_form.text_color"></el-color-picker>
-                    </el-form-item>    
-                </el-col> 
-        
-            </el-row>
-    
-
-            <el-form-item label="Description">
-                    <el-input v-model="route_form.description"></el-input>
-            </el-form-item>
-
-
-            <el-row :gutter="20">
-                <el-col :span="7">
-                    <el-form-item label="Continous pickup">
-                        <el-select 
-                            v-model="route_form.continuous_pickup" 
-                            placeholder="-">
-                                <el-option
-                                v-for="(item, index) in pickup_list"
-                                :key="index"
-                                :value="index">
-                                {{item}}
-                                </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="7">
-                    <el-form-item label="Continous drop off">          
-                        <el-select 
-                            v-model="route_form.continuous_drop_off" 
-                            placeholder="-">
-                                <el-option
-                                v-for="(item, index) in dropoff_list"
-                                :key="index"
-                                :value="index">
-                                {{item}}
-                                </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="9">
-                    <el-form-item label="URL">
-                        <el-input v-model="route_form.url">{{route_form.url}}</el-input>
-                    </el-form-item>
-                </el-col>
-            </el-row>
-        </el-form>
-
-
-        <h3>Service Days</h3>
-        <el-form label-width="160px">
-            <el-row :gutter="100">
-                
-                <!-- select a existed service to edit -->
-                <el-col :span="9" >
-                    <el-form-item label="Service ID">
-                        <el-select 
-                        v-model="form.serviceID" 
-                        placeholder="select a Route" 
-                        filterable                       
-                        @change="refresh_service">
-                            <el-option
-                            v-for="item in service_list"
-                            :key="item"
-                            :value="item">
-                            {{item}}
-                            </el-option>
-                        </el-select>
-                    </el-form-item>
-                </el-col>
-
-                <el-col :span="3">
-                    <div class="grid-content bg-purple">
-                        <el-button type="info" plain>Creat a Service</el-button>
-                    </div>
-                </el-col>
-            
-            </el-row>
-                       
-
-            <!-- Service Interval -->
-            <el-row>
-                <el-col :offset="1">
-                    <div class="block">
-                        <span class="demonstration">Service Interval </span>
-                        <el-date-picker
-                        inline
-                        v-model="range"
-                        type="daterange"
-                        value-format="yyyyMMdd"
-                        format="yyyy-MM-dd"
-                        range-separator="To"
-                        start-placeholder="Start date"
-                        end-placeholder="End date"
-                        >
-                        </el-date-picker>
-                    </div>
-                </el-col>
-            </el-row>
-            
-            <br>
-
-            <!-- select weekdays -->
-            <el-row>
-                <el-col :offset="6"  :span="12">                  
-                    <el-checkbox label="Mon" v-model="week[0]" true-label="1" false-label="0"></el-checkbox>
-                    <el-checkbox label="Tue" v-model="week[1]" true-label="1" false-label="0"></el-checkbox>
-                    <el-checkbox label="Wed" v-model="week[2]" true-label="1" false-label="0"></el-checkbox>
-                    <el-checkbox label="Thu" v-model="week[3]" true-label="1" false-label="0"></el-checkbox>
-                    <el-checkbox label="Fri" v-model="week[4]" true-label="1" false-label="0"></el-checkbox>
-                    <el-checkbox label="Sat" v-model="week[5]" true-label="1" false-label="0"></el-checkbox>
-                    <el-checkbox label="Sun" v-model="week[6]" true-label="1" false-label="0"></el-checkbox>
-                </el-col> 
-
-                <el-col :span="4">
-                    <el-button type="warning" @click="refreshCalender" plain>show Calender</el-button>
-                </el-col>  
-                  
-            </el-row>
-            
-            <br>
-        
-            <!-- Calender -->
-        
-            <v-calendar
-            class="vc-container "
-            :attributes="attrs"
-            ref="calendar"
-            is-inline
-            :masks="{L: 'YYYYMMDD'}"               
-            @dayclick="dayclick"
-            :rows="3"
-            :columns="$screens({ default: 4})"                  
-            />
-
-           
-        </el-form>
-                
-         <el-button type="success" round @click="onSubmit">Submit</el-button>
-        <button @click="test">测试</button>
-        <Service ref="service" :form='form' ></Service>
+        <el-tab-pane label="Frenquencies">
+            <Frenquencies
+                ref="frenquencies" 
+                :tripform='form'>
+            </Frenquencies>
+        </el-tab-pane>
+    </el-tabs>
+     
         
     </div>
 </template>
@@ -346,10 +192,15 @@
 <script>
 import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
 import Service from '@/components/trip/Service'
-
+import Route from '@/components/trip/Route'
+import Stop from '@/components/trip/Stop'
+import Frenquencies from '@/components/trip/Frenquencies'
     export default {
         components:{
             Service,
+            Route,
+            Stop,
+            Frenquencies,
         },
         data(){
             return{
@@ -364,183 +215,21 @@ import Service from '@/components/trip/Service'
                     routeID:"",
                     serviceID:"",
                 },
+                route_list:"",
 
-                route_form:{
-                    agency_id:"",
-                    shortName:"",
-                    longName:"",                   
-                    url:"",
-                    type:"",
-                    sort_order:"",
-                    route_color:"",
-                    text_color:"",
-                    description:"",
-                    continuous_pickup:"",
-                    continuous_drop_off:"",
 
-                },
-
-                agency_name:"",
-                trip_id_list:[],
-                route_id_list:[],
-                agency_list:[],
-                
-                pickup_list:["Continuous stopping pickup","No continuous stopping pickup","Must phone an agency","Must coordinate with a driver"],
-                dropoff_list:["Continuous stopping drop-off","No continuous stopping drop-off","Must phone an agency","Must coordinate with a driver"],
-
-                type_map:new Map([[0,"Tram"],[1,"Subway"],[2,"Rail"],[3,"Bus"],[4,"Ferry"],[5,"Cable tram"],[6,"Aerial lift"],[7,"Funicular"],[11,"Trolleybus"],[12,"Monorail"],
-                                    [100,"Railway Service"], //Extended GTFS Route Types supported by Google Maps
-                                    [101,"High Speed Rail Service"],	
-                                    [102,"Long Distance Trains"],		
-                                    [103,"Inter Regional Rail Service"],		
-                                    [104,"Car Transport Rail Service"],		 	 
-                                    [105,"Sleeper Rail Service"],		
-                                    [106,"Regional Rail Service"],		
-                                    [107,"Tourist Railway Service"],	
-                                    [108,"Rail Shuttle (Within Complex)"],		
-                                    [109,"Suburban Railway"],	
-                                    [200,"Coach Service"],			 
-                                    [201,"International Coach Service"],		
-                                    [202,"National Coach Service"],		
-                                    [203,"Shuttle Coach Service"],		 
-                                    [204,"Regional Coach Service"],		
-                                    [400,"Urban Railway Service"],			 
-                                    [401,"Metro Service	"],	
-                                    [402,"Underground Service"],		
-                                    [403,"Urban Railway Service"],		
-                                    [405,"Monorail"],			 
-                                    [700,"Bus Service"],			 
-                                    [701,"Regional Bus Service"],		
-                                    [702,"Express Bus Service"],		
-                                    [704,"Local Bus Service"],	
-                                    [715,"Demand and Response Bus Service"],	
-                                    [800,"Trolleybus Service"],		 
-                                    [900,"Tram Service"],	
-                                    [1200,"Ferry Service	"],		 
-                                    [1300,"Aerial Lift Service"],		
-                                    [1400,"Funicular Service"],		
-                                    [1500,"Taxi Service"],		 
-                                    [1501,"Communal Taxi Service"],	
-                                    [1700,"Miscellaneous Service"],			 
-                                    [1702,"Horse-drawn Carriage"]]),
-                
-                type_map_copy:new Map([[0,"Tram"],[1,"Subway"],[2,"Rail"],[3,"Bus"],[4,"Ferry"],[5,"Cable tram"],[6,"Aerial lift"],[7,"Funicular"],[11,"Trolleybus"],[12,"Monorail"],
-                                [100,"Railway Service"], //Extended GTFS Route Types supported by Google Maps
-                                [101,"High Speed Rail Service"],	
-                                [102,"Long Distance Trains"],		
-                                [103,"Inter Regional Rail Service"],		
-                                [104,"Car Transport Rail Service"],		 	 
-                                [105,"Sleeper Rail Service"],		
-                                [106,"Regional Rail Service"],		
-                                [107,"Tourist Railway Service"],	
-                                [108,"Rail Shuttle (Within Complex)"],		
-                                [109,"Suburban Railway"],	
-                                [200,"Coach Service"],			 
-                                [201,"International Coach Service"],		
-                                [202,"National Coach Service"],		
-                                [203,"Shuttle Coach Service"],		 
-                                [204,"Regional Coach Service"],		
-                                [400,"Urban Railway Service"],			 
-                                [401,"Metro Service	"],	
-                                [402,"Underground Service"],		
-                                [403,"Urban Railway Service"],		
-                                [405,"Monorail"],			 
-                                [700,"Bus Service"],			 
-                                [701,"Regional Bus Service"],		
-                                [702,"Express Bus Service"],		
-                                [704,"Local Bus Service"],	
-                                [715,"Demand and Response Bus Service"],	
-                                [800,"Trolleybus Service"],		 
-                                [900,"Tram Service"],	
-                                [1200,"Ferry Service	"],		 
-                                [1300,"Aerial Lift Service"],		
-                                [1400,"Funicular Service"],		
-                                [1500,"Taxi Service"],		 
-                                [1501,"Communal Taxi Service"],	
-                                [1700,"Miscellaneous Service"],			 
-                                [1702,"Horse-drawn Carriage"]]),
-                
-                service_list:[],
-                range: ["20200101","20200202"],
-                exception_type1:[], //the imported specified date , will never be changed later   the edited array is in attrs
-                exception_type2:[],
-                week:[0,0,0,0,0,0,0], //week[0]=1 : Monday is selected
-
-                attrs:[
-                        {   
-                            highlight: true,
-                            dates:{
-                                    start:"20200101",
-                                    end:"20200202",   
-                                    weekdays:[] //1: Sun to 7: Sat
-                                },
-                        },
-                        {   //exception_type 2
-                            highlight: "red", //Service has been removed for the specified date.
-                            dates:[],  //edited Exception2
-                        },
-                        {   //exception_type 1
-                            highlight: "green", //Service has been added for the specified date.
-                            dates:[],  //edited Exception1
-                        },
-                        {   
-                            highlight: false,
-                            dates:[],
-                        }
-                    ],
-              
             }
         },
         computed:{
-            ...mapState(['GTFSmap','filenames','saved']), //improt share variable from store
+            ...mapState(['GTFSmap','filenames','saved','trip_id_list','route_id_list','service_list']), //improt share variable from store
             
-            weekarray(){
-                var weekarray=new Array();
-                for(var index in this.week){
-                    if(this.week[index]==1){
-                        if(index==6){
-                            weekarray.push(1);
-                            continue;
-                        }
-                        weekarray.push(parseInt(index)+2);
-                    }
-                }
-                return weekarray;
-            },
 
         },
        
         methods:{
             
-            test(){
-                //this.$store.commit('setAttributeValue',["trips.txt","trip_id","AB1","trip_id","123123123"])
-                console.log(this.range);
-                
-            },
 
-            // //input:filename   attributtype 
-            // //output:a Array of all the value of this Type 
-            // getallAttribut(filename,attributtype){
-            // var filearray=this.GTFSmap.get(filename);
-            // var fileAttributeType=filearray[0].split(',');
-            // var found=false;
-            // var i;// position of the attribute to find
-            // for(i in fileAttributeType){
-            //     if(fileAttributeType[i]==attributtype){
-            //     found=true;
-            //     break;
-            //     }
-            // }      
-            // var result=new Set();
-            // if(!found){return result;}
-            // for(var j =1;j<filearray.length;j++){
-            //     var temp=filearray[j].split(',');
-            //     result.add(temp[i]);
-            // }
-            // return Array.from(result);         
-            // },
-
-
+         
 
             //refresh the data in Trip according to the trip_id
             refresh_trip(){               
@@ -552,41 +241,27 @@ import Service from '@/components/trip/Service'
                 this.form.bikes=this.$store.getters.getAttributeValue("trips.txt","trip_id",this.form.tripID,"trip_bike_allowed");
                 this.form.routeID=this.$store.getters.getAttributeValue("trips.txt","trip_id",this.form.tripID,"route_id");
                 this.form.serviceID=this.$store.getters.getAttributeValue("trips.txt","trip_id",this.form.tripID,"service_id");
-                this.refresh_route();
-                this.refresh_service()
+                
+                this.$refs.route.refresh_route();
+                this.$refs.service.refresh_service();
+                this.$refs.stop.refresh_stop();
+                this.$refs.frenquencies.refresh();
+                
             }, 
 
-
+            //filter routeid by route_id  short name and long name
+            filterRoute(input){
+                input=input.toLowerCase();
+                this.route_list=this.route_id_list;
+                if (input) { 
+                    //when input is not empty
+                    this.route_list = this.route_list.filter((id => this.$store.getters.getAttributeValue('routes.txt','route_id',id,'route_long_name').toLowerCase().indexOf(input)>=0 || 
+                                                                        this.$store.getters.getAttributeValue('routes.txt','route_id',id,'route_short_name').toLowerCase().indexOf(input)>=0||
+                                                                        id.toLowerCase().indexOf(input)>=0));                   
+                } 
             
-            refresh_route(){
-                this.route_form.agency_id=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"agency_id"); 
-                this.route_form.shortName=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_short_name");  
-                this.route_form.longName=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_long_name"); 
-                this.route_form.url=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_url");  
-                this.route_form.type=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_type");   
-                this.route_form.sort_order=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_sort_order"); 
-                this.route_form.route_color=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_color"); 
-                this.route_form.text_color=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_text_color"); 
-                this.route_form.description=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"route_desc"); 
-                
-                
-                var allattrbute=this.GTFSmap.get("routes.txt");
-                allattrbute=allattrbute[0];
-                if(allattrbute.indexOf("continuous_pickup")!=-1){
-                    //1 or empty - No continuous stopping
-                    this.route_form.continuous_pickup=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"continuous_pickup");
-                    if(this.route_form.continuous_pickup==""){this.route_form.continuous_pickup=1;} 
-                }
-                if(allattrbute.indexOf("continuous_drop_off")!=-1){
-                    this.route_form.continuous_drop_off=this.$store.getters.getAttributeValue("routes.txt","route_id",this.form.routeID,"continuous_drop_off"); 
-                    if(this.route_form.continuous_drop_off==""){this.route_form.continuous_drop_off=1;} 
-                }
-                
-                
             },
 
-          
-            
             //save all the changes in this page
             onSubmit() {
                 console.log('submit!');
@@ -594,186 +269,28 @@ import Service from '@/components/trip/Service'
             },
 
 
-            //filter the key and value in the type_map
-            filterMap(input){
-                input=input.toLowerCase();         
-                if (input) { 
-                    //when input is not empty
-                    this.type_map = new Map(
-                                [...this.type_map].filter(([k, v]) => k.toString().indexOf(input)>=0 || 
-                                                                        this.type_map.get(k).toLowerCase().indexOf(input)>=0));                   
-                } 
-                else { 
-                    //when input is empty, resume the type_map
-                    this.type_map = this.type_map_copy;
-                }
-
-                
-            },
-
-
-            refresh_service(){
-                this.exception_type1=this.$store.getters.getDateArray(this.form.serviceID,1); 
-                this.exception_type2=this.$store.getters.getDateArray(this.form.serviceID,2); 
-                
-                var start=this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"start_date"); 
-                var end=this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"end_date"); 
-                this.range=[start,end];
-                var week=[];
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"monday")); 
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"tuesday")); 
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"wednesday")); 
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"thursday")); 
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"friday")); 
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"saturday")); 
-                week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"sunday")); 
-                this.week=week;
-                setTimeout(this.refreshCalender,100);
-                //this.refreshCalender();               
-            },
-
-            refreshCalender(){
-                this.closeHighlight;
-                const calendar = this.$refs.calendar;                
-                calendar.move({ month:1, year: this.range[0].substring(0,4) })
-                let attrs=[...this.attrs];
-                
-                attrs=[
-                    {   
-                        highlight: true,
-                        dates:{
-                                start:this.range[0]+100,
-                                end:this.range[1]+100,   
-                                weekdays:this.weekarray 
-                            },
-                    },
-                    {   
-                        highlight: "red",
-                        dates:this.exception_type2,
-                    },
-                    {   
-                        highlight: "green",
-                        dates:this.exception_type1,
-                    },
-                    {   
-                        highlight: false,
-                        dates:[],
-                    }
-                ],
-                
-                this.attrs=attrs;
-                
-            },
-
-            closeHighlight(){
-                let attrs=[...this.attrs];
-                for(var i in attrs){
-                    attrs[i].highlight=false;
-                }  
-                this.attrs=attrs;
-            },
-            openHighlight(){
-                
-                let attrs=[...this.attrs];
-                attrs[0].highlight=true;
-                attrs[1].highlight="red";
-                attrs[2].highlight='green';
-                attrs[3].highlight=false;
-                attrs[4].highlight=true;
-                this.attrs=attrs;
-            },
-
-            //change the highlight in the calender
-            dayclick(e){
-                this.closeHighlight();
-                var day="";
-                if(e.year<1000){
-                    day+="0";
-                    day+=e.year;  
-                }
-                else{
-                    day+=e.year;
-                }
-                if(e.month<10){
-                    day+="0";
-                    day+=e.month;
-                }
-                else{
-                    day+=e.month;
-                }
-                if(e.day<10){
-                    day+="0";
-                    day+=e.day;
-                }
-                else{
-                    day+=e.day;
-                }
-
-                let attrs=[...this.attrs];
-    
-                var inRange=false;
-                var inRed=attrs[1].dates.findIndex(item => item == day);
-                var inGreen=attrs[2].dates.findIndex(item => item == day);
-
-                if(day>=this.range[0]&&day<=this.range[1]){
-                    var date=new Date(e.year,e.month-1,e.day);
-                    var weekday=date.getDay();
-                    if(this.week[weekday-1]==1){
-                        inRange=true;    
-                    } 
-                }
-
-                if(inRange&&(inRed==-1)){
-                    //blue->red
-                    attrs[1].dates.push(day);
-                }
-                else if(inRed!=-1){
-                    //red--> blue   
-                    attrs[1].dates.splice(inRed,1);
-                }
-                else if(inGreen!=-1){
-                    //green->white
-                    attrs[2].dates.splice(inGreen,1);
-                    attrs[3].dates.push(day);
-                }
-                else{
-                    //white->green
-                    attrs[2].dates.push(day);
-                }
-                
-                this.attrs=attrs;
-                this.openHighlight();
-                
-            }
-
         },
         watch:{
 
-            saved(val){   
-                const calendar = this.$refs.calendar;                
-                calendar.move({ month:1, year: this.range[0].substring(0,4)})            
+            saved(val){              
                 if(val){  
                     setTimeout(() => {
-                        this.trip_id_list=this.$store.getters.getallAttribut("trips.txt","trip_id");                    
-                        this.route_id_list=this.$store.getters.getallAttribut("routes.txt","route_id"); 
-                        this.agency_list=this.$store.getters.getallAttribut("agency.txt","agency_id");
-                        this.service_list=this.$store.getters.getallAttribut("calendar.txt","service_id");
+                        var trip_id_list=this.$store.getters.getallAttribut("trips.txt","trip_id");
+                        this.$store.commit('setTrip_id_list',trip_id_list);                    
+                        
+                        var route_id_list=this.$store.getters.getallAttribut("routes.txt","route_id");
+                        this.route_list=route_id_list;
+                        this.$store.commit('setRoute_id_list',route_id_list);  
+                        
+                        var service_list=this.$store.getters.getallAttribut("calendar.txt","service_id");
+                        this.$store.commit('setService_list',service_list);   
+                    
+                        var stop_id_list=this.$store.getters.getallAttribut("stops.txt","stop_id");
+                        this.$store.commit('setStop_id_list',stop_id_list); 
                     }, 100)  
                 }                  
                 
             },
-
-            range(){
-                this.closeHighlight();
-            },
-            week(){
-                this.closeHighlight();
-                //exception也得改
-            },
-
-            
-           
-
 
         },
 
@@ -783,11 +300,28 @@ import Service from '@/components/trip/Service'
 
 <style scoped>
 
-.vc-container{
-  --day-content-height : 5px;
-  --day-content-width : 5px;
-  width: auto !important;
-  
+.optionsContainter span{
+    width:120px;
+    text-align: center;
+}
+.optionsContainter{
+    width:70%;
+    display: block;
+}
+
+.optionHeader span{
+    width:120px;
+    text-align: center;
+}
+.optionHeader{
+    background:rgb(98, 116, 150);
+    color:#fff;
+    height: 40px;
+    line-height: 40px;
+    font-size:14px;
+    font-family:HiraginoSansGB-W3;
+    font-weight:600;
+    padding: 0 20px;
 }
 
 

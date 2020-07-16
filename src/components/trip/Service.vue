@@ -5,12 +5,13 @@
             <el-row :gutter="100">
                 
                 <!-- select a existed service to edit -->
-                <el-col :span="9" >
+                <el-col :span="10" >
                     <el-form-item label="Service ID">
                         <el-select 
                         v-model="form.serviceID" 
-                        placeholder="select a Route" 
-                        filterable                       
+                        placeholder="select a Service" 
+                        filterable  
+                        style="width:100%"                     
                         @change="refresh_service">
                             <el-option
                             v-for="item in service_list"
@@ -24,7 +25,7 @@
 
                 <el-col :span="3">
                     <div class="grid-content bg-purple">
-                        <el-button type="info" plain>Creat a Service</el-button>
+                        <el-button type="danger" plain>Creat a Service</el-button>
                     </div>
                 </el-col>
             
@@ -55,7 +56,7 @@
 
             <!-- select weekdays -->
             <el-row>
-                <el-col :offset="6"  :span="12">                  
+                <el-col :offset="2"  :span="14">                  
                     <el-checkbox label="Mon" v-model="week[0]" true-label="1" false-label="0"></el-checkbox>
                     <el-checkbox label="Tue" v-model="week[1]" true-label="1" false-label="0"></el-checkbox>
                     <el-checkbox label="Wed" v-model="week[2]" true-label="1" false-label="0"></el-checkbox>
@@ -74,9 +75,8 @@
             <br>
         
             <!-- Calender -->
-        
             <v-calendar
-            class="vc-container "
+            class="vc-container"
             :attributes="attrs"
             ref="calendar"
             is-inline
@@ -86,21 +86,24 @@
             :columns="$screens({ default: 4})"                  
             />
 
-           
         </el-form>
+
+        <el-row>
+            <el-col :offset="20">
+                <el-button type="success" round @click="onSubmit">Submit</el-button>
+            </el-col>
+        </el-row>
   </div>
 </template>
 
 <script>
 import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
 export default {
-    props:['form'],
+    props:['tripform'],
     
     data(){
         return{
-            form:this.form,
-            trip_id_list:[],
-            service_list:[],
+            form:this.tripform,
             range: ["20200101","20200202"],
             exception_type1:[], //the imported specified date , will never be changed later   the edited array is in attrs
             exception_type2:[],
@@ -131,7 +134,7 @@ export default {
     },
     
     computed:{
-    ...mapState(['GTFSmap','filenames','saved']), //improt share variable from store
+    ...mapState(['GTFSmap','filenames','saved','trip_id_list','service_list']), //improt share variable from store
     
         weekarray(){
             var weekarray=new Array();
@@ -165,7 +168,7 @@ export default {
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"saturday")); 
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"sunday")); 
             this.week=week;
-            setTimeout(this.refreshCalender,100);
+            setTimeout(this.refreshCalender,200);
             //this.refreshCalender();               
         },
 
@@ -281,21 +284,18 @@ export default {
             this.attrs=attrs;
             this.openHighlight();
             
-        }
+        },
+
+        onSubmit(){
+
+        },
 
     },
+    mounted:function(){
+        const calendar = this.$refs.calendar;                
+        calendar.move({ month:1, year: this.range[0].substring(0,4)}) ; 
+    },
     watch:{
-        saved(val){   
-                const calendar = this.$refs.calendar;                
-                calendar.move({ month:1, year: this.range[0].substring(0,4)})            
-                if(val){  
-                    setTimeout(() => {
-                        this.trip_id_list=this.$store.getters.getallAttribut("trips.txt","trip_id");                    
-                        this.service_list=this.$store.getters.getallAttribut("calendar.txt","service_id");
-                    }, 100)  
-                }                  
-                
-        },
         range(){
                 this.closeHighlight();
         },
@@ -311,10 +311,7 @@ export default {
 <style>
 
 .vc-container{
-  --day-content-height : 5px;
-  --day-content-width : 5px;
   width: auto !important;
-  
 }
 
 </style>
