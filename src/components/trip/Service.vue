@@ -5,12 +5,13 @@
             <el-row :gutter="100">
                 
                 <!-- select a existed service to edit -->
-                <el-col :span="9" >
+                <el-col :span="10" >
                     <el-form-item label="Service ID">
                         <el-select 
                         v-model="form.serviceID" 
                         placeholder="select a Service" 
-                        filterable                       
+                        filterable  
+                        style="width:100%"                     
                         @change="refresh_service">
                             <el-option
                             v-for="item in service_list"
@@ -75,7 +76,7 @@
         
             <!-- Calender -->
             <v-calendar
-            class="vc-container "
+            class="vc-container"
             :attributes="attrs"
             ref="calendar"
             is-inline
@@ -290,13 +291,11 @@ export default {
         },
 
     },
+    mounted:function(){
+        const calendar = this.$refs.calendar;                
+        calendar.move({ month:1, year: this.range[0].substring(0,4)}) ; 
+    },
     watch:{
-        saved(val){   
-                const calendar = this.$refs.calendar;                
-                calendar.move({ month:1, year: this.range[0].substring(0,4)})            
-                                 
-                
-        },
         range(){
                 this.closeHighlight();
         },
@@ -312,10 +311,7 @@ export default {
 <style>
 
 .vc-container{
-  --day-content-height : 5px;
-  --day-content-width : 5px;
   width: auto !important;
-  
 }
 
 </style>
