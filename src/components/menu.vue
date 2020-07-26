@@ -4,12 +4,17 @@
 
     <el-container>
 
-        <el-aside width="110px" >
+        <el-aside width="120px" >
                 <el-menu
                     class="el-menu-vertical-demo"
                     :default-active="this.$route.path"
                     :router="true"
                 >
+                    <el-menu-item index="/home">
+                        <i class="el-icon-upload"></i>
+                        <span slot="title">Home</span>
+                    </el-menu-item>
+
                     <el-menu-item index="/trip">
                         <i class="el-icon-truck"></i>
                         <span slot="title">Trip</span>
@@ -28,15 +33,13 @@
                 </el-menu>
         </el-aside>
         
-        <el-container>
-            <el-header>
-                <document-menu></document-menu>
-            </el-header>
-            <el-main>
-                <router-view></router-view>
-            </el-main>
-        </el-container>
+      
+          <el-main>
+              <router-view></router-view>
+          </el-main>
+      
     </el-container>
+    
   </div>
     
   

@@ -40,7 +40,7 @@
 
             <el-col :span="3">
                 <div class="grid-content bg-purple">
-                    <el-button type="info" plain @click="setdialogFormVisible(true)" >Creat a Route</el-button>
+                    <el-button type="danger" plain @click="setdialogFormVisible(true)" >Creat a Route</el-button>
                     <CreateRoute :visible="dialogFormVisible" @setVisible='setdialogFormVisible' @setRouteID="setRouteID"></CreateRoute>
                 </div>
             </el-col>
@@ -349,14 +349,12 @@ export default {
         },
 
         setRouteID(val){
-            this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"route_id",val]);
+            this.$emit("setRouteID",val);
             this.refresh_route();
-            this.$emit("refresh");
         },
         onSubmit(){
 
             this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"route_id",this.form.routeID]);
-            this.$emit("refresh");
             this.$store.commit('setAttributeValue',["routes.txt","route_id",this.form.routeID,"agency_id",this.route_form.agency_id]);
             this.$store.commit('setAttributeValue',["routes.txt","route_id",this.form.routeID,"route_short_name",this.route_form.shortName]);
             this.$store.commit('setAttributeValue',["routes.txt","route_id",this.form.routeID,"route_long_name",this.route_form.longName]);
@@ -368,7 +366,7 @@ export default {
             this.$store.commit('setAttributeValue',["routes.txt","route_id",this.form.routeID,"route_desc",this.route_form.description]);
             this.$store.commit('setAttributeValue',["routes.txt","route_id",this.form.routeID,"continuous_pickup",this.route_form.continuous_pickup]);
             this.$store.commit('setAttributeValue',["routes.txt","route_id",this.form.routeID,"continuous_drop_off",this.route_form.continuous_drop_off]);
-
+            this.$message('already saved');
         }
     },
     watch:{

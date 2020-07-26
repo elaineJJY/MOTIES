@@ -39,10 +39,7 @@ export default new Vuex.Store({
       }
       return Array.from(result);         
     },
-    
-
-
-    
+        
      //returns the value of this Type with UIDvalue, if the file does not have this AttributeType, than return""
     getAttributeValue:(state)=>(filename,UIDtype,UIDvalue,attributtype)=>{
       var filearray=state.GTFSmap.get(filename);
@@ -99,9 +96,6 @@ export default new Vuex.Store({
       
       return result;      
     },
-
-  
-
     
      //returns the array of this Type with serviceID
     getDateArray:(state)=>(serviceID,exception_type)=>{
@@ -122,13 +116,15 @@ export default new Vuex.Store({
           indexException=j;
         }
       }
+      var rows=[];
       for(j =1;j<filearray.length;j++){
         temp=filearray[j].split(',');
         if(temp[indexServiceID]==serviceID&&temp[indexException]==exception_type){
+          rows.push(j);
           result.push(temp[indexDate]);
         }        
       }
-      return result;     
+      return [result,rows];     
     },
 
   },
@@ -194,7 +190,6 @@ export default new Vuex.Store({
       var filearray=state.GTFSmap.get(filename);
       var fileAttributeType=filearray[0].split(','); 
       
-      
       //find the position of the element to change   
       var uid_position;// position of the UID
       var attribute_position=-1;
@@ -228,7 +223,7 @@ export default new Vuex.Store({
           break;
         }        
       }
-
+      
       //write new text
       s="";
       for(var i in fileAttributeType){
@@ -295,6 +290,7 @@ export default new Vuex.Store({
     },
 
     deleteRows(state,[filename,rows]){
+      
       var filearray=state.GTFSmap.get(filename);
       rows.sort().reverse();
       
