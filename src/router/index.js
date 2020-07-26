@@ -7,19 +7,19 @@ Vue.use(VueRouter)
 
   const routes = [
   {
-    path: '/',
+    path: '/home',
     name: 'Home',
     component: Home
   },
   {
     path: '/trip',
     name: 'Trip',
-    component: () => import(/* webpackChunkName: "about" */ '../components/trip-table.vue')
+    component: () => import('../views/Trip.vue')
   },
   {
     path: '/station',
     name: 'Trip',
-    component: () => import(/* webpackChunkName: "about" */ '../components/trip-table.vue')
+    component: () => import('../views/Trip.vue')
   }
 ]
 

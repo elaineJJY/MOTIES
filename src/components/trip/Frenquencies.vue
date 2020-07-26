@@ -205,7 +205,7 @@ import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
                     this.$store.commit("setRows",["frequencies.txt",temp.row,"exact_times",temp.exact_times]);
                 }
                 this.$store.commit('deleteRows',["frequencies.txt",this.toDeletRows]);
-                
+                this.$message('already saved');
                 this.refresh();
             }
 

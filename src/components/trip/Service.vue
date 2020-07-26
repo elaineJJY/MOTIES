@@ -25,7 +25,8 @@
 
                 <el-col :span="3">
                     <div class="grid-content bg-purple">
-                        <el-button type="danger" plain>Creat a Service</el-button>
+                        <el-button type="danger" plain @click="setdialogFormVisible(true)">Creat a Service</el-button>
+                        <CreateService :visible="dialogFormVisible" @setVisible='setdialogFormVisible' @setServiceID="setServiceID"></CreateService>
                     </div>
                 </el-col>
             
@@ -33,26 +34,21 @@
                        
 
             <!-- Service Interval -->
-            <el-row>
-                <el-col :offset="1">
-                    <div class="block">
-                        <span class="demonstration">Service Interval </span>
-                        <el-date-picker
-                        inline
-                        v-model="range"
-                        type="daterange"
-                        value-format="yyyyMMdd"
-                        format="yyyy-MM-dd"
-                        range-separator="To"
-                        start-placeholder="Start date"
-                        end-placeholder="End date"
-                        >
-                        </el-date-picker>
-                    </div>
-                </el-col>
-            </el-row>
+               
+            <el-form-item label="Service Interval"> 
+                <el-date-picker
+                v-model="range"
+                type="daterange"
+                value-format="yyyyMMdd"
+                format="yyyy-MM-dd"
+                range-separator="To"
+                start-placeholder="Start date"
+                end-placeholder="End date"
+                >
+                </el-date-picker>
+            </el-form-item>
+                
             
-            <br>
 
             <!-- select weekdays -->
             <el-row>
@@ -67,7 +63,7 @@
                 </el-col> 
 
                 <el-col :span="4">
-                    <el-button type="warning" @click="refreshCalender" plain>show Calender</el-button>
+                    <el-button type="warning" @click="show" plain>show Calender</el-button>
                 </el-col>  
                   
             </el-row>
@@ -98,16 +94,21 @@
 
 <script>
 import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
+import  CreateService from './CreateService';
 export default {
     props:['tripform'],
-    
+    components:{
+        CreateService,
+    },
     data(){
         return{
+            dialogFormVisible:false,
             form:this.tripform,
             range: ["20200101","20200202"],
             exception_type1:[], //the imported specified date , will never be changed later   the edited array is in attrs
             exception_type2:[],
             week:[0,0,0,0,0,0,0], //week[0]=1 : Monday is selected
+            toDeletRows:[],
             attrs:[
                     {   
                         highlight: true,
@@ -151,14 +152,19 @@ export default {
         },
     },
     methods:{
-
         refresh_service(){
-            this.exception_type1=this.$store.getters.getDateArray(this.form.serviceID,1); 
-            this.exception_type2=this.$store.getters.getDateArray(this.form.serviceID,2); 
+            var temp=this.$store.getters.getDateArray(this.form.serviceID,1);
+            this.exception_type1=temp[0];
+            this.toDeletRows=temp[1];
+            temp=this.$store.getters.getDateArray(this.form.serviceID,2);
+            this.exception_type2=temp[0];
+           
+            this.toDeletRows=this.toDeletRows.concat(temp[1]); 
             
             var start=this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"start_date"); 
             var end=this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"end_date"); 
             this.range=[start,end];
+
             var week=[];
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"monday")); 
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"tuesday")); 
@@ -168,16 +174,15 @@ export default {
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"saturday")); 
             week.push(this.$store.getters.getAttributeValue("calendar.txt","service_id",this.form.serviceID,"sunday")); 
             this.week=week;
-            setTimeout(this.refreshCalender,200);
-            //this.refreshCalender();               
+            setTimeout(this.refreshCalender,100);        
         },
 
         refreshCalender(){
-            this.closeHighlight;
+            this.closeHighlight();
             const calendar = this.$refs.calendar;                
             calendar.move({ month:1, year: this.range[0].substring(0,4) })
             let attrs=[...this.attrs];
-            
+
             attrs=[
                 {   
                     highlight: true,
@@ -205,6 +210,13 @@ export default {
             
         },
 
+        show(){
+            this.exception_type1=[];
+            this.exception_type2=[];
+            this.refreshCalender();
+        },
+
+
         closeHighlight(){
             let attrs=[...this.attrs];
             for(var i in attrs){
@@ -212,14 +224,12 @@ export default {
             }  
             this.attrs=attrs;
         },
-        openHighlight(){
-            
+        openHighlight(){ 
             let attrs=[...this.attrs];
             attrs[0].highlight=true;
             attrs[1].highlight="red";
             attrs[2].highlight='green';
-            attrs[3].highlight=false;
-            attrs[4].highlight=true;
+            attrs[3].highlight=false;       
             this.attrs=attrs;
         },
 
@@ -258,6 +268,9 @@ export default {
             if(day>=this.range[0]&&day<=this.range[1]){
                 var date=new Date(e.year,e.month-1,e.day);
                 var weekday=date.getDay();
+                if(weekday==0){
+                    weekday=6;
+                }
                 if(this.week[weekday-1]==1){
                     inRange=true;    
                 } 
@@ -286,8 +299,51 @@ export default {
             
         },
 
-        onSubmit(){
 
+        setdialogFormVisible(val){
+            this.dialogFormVisible = val;
+        },
+
+        setServiceID(id){
+            this.form.serviceID=id;
+            this.refresh_service();
+            this.$emit("setServiceID",id);
+        },
+
+        onSubmit(){
+            //trip.txt
+            this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"service_id",this.form.serviceID]);
+            
+            //calendar.txt
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"start_date",this.range[0]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"end_date",this.range[1]]);
+
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"monday",this.week[0]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"tuesday",this.week[1]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"wednesday",this.week[2]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"thursday",this.week[3]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"friday",this.week[4]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"saturday",this.week[5]]);
+            this.$store.commit('setAttributeValue',["calendar.txt","service_id",this.form.serviceID,"sunday",this.week[6]]);
+
+            //calandar_dates.txt
+        
+            this.$store.commit('deleteRows',["calendar_dates.txt",this.toDeletRows]);
+            for(let date of this.attrs[2].dates){     //exception_type 1
+                var theLastrow=this.GTFSmap.get("calendar_dates.txt").length;
+                this.$store.commit("setRows",["calendar_dates.txt",theLastrow,"service_id",this.form.serviceID]);
+                this.$store.commit("setRows",["calendar_dates.txt",theLastrow,"date",date]);
+                this.$store.commit("setRows",["calendar_dates.txt",theLastrow,"exception_type",1]);
+            }
+            
+            for(let date of this.attrs[1].dates){     //exception_type 2
+                var theLastrow=this.GTFSmap.get("calendar_dates.txt").length;
+                this.$store.commit("setRows",["calendar_dates.txt",theLastrow,"service_id",this.form.serviceID]);
+                this.$store.commit("setRows",["calendar_dates.txt",theLastrow,"date",date]);
+                this.$store.commit("setRows",["calendar_dates.txt",theLastrow,"exception_type",2]);
+            }
+            this.$message('already saved');
+            this.refresh_service();
         },
 
     },
@@ -297,7 +353,7 @@ export default {
     },
     watch:{
         range(){
-                this.closeHighlight();
+            this.closeHighlight();
         },
         week(){
             this.closeHighlight();

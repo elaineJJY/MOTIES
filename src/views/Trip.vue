@@ -25,7 +25,8 @@
 
             <el-col :span="3">
                 <div class="grid-content bg-purple">
-                    <el-button type="danger" plain>Creat a Trip</el-button>
+                    <el-button type="danger" plain @click="setdialogFormVisible(true)">Creat a Trip</el-button>
+                    <CreateTrip :visible="dialogFormVisible" @setVisible='setdialogFormVisible' @setTripID="setTripID"></CreateTrip>
                 </div>
             </el-col>
         </el-row>
@@ -67,10 +68,14 @@
 
                         <el-col :span="10">
                             <el-form-item label="Direction">
-                                ! need change
                                 <el-select v-model="form.direction" placeholder="-">
-                                    <el-option label="1" value="shanghai"></el-option>
-                                    <el-option label="2" value="beijing"></el-option>
+                                    <el-option
+                                    v-for="(item, index) in directions"
+                                    :key="index"
+                                    :value="index"
+                                    :label="item">
+                                    {{item}}
+                                    </el-option>
                                 </el-select>
                             </el-form-item>
                         </el-col>
@@ -114,7 +119,7 @@
                                         </div>
                                     </template>
                                     <el-option
-                                    v-for="item in route_list"
+                                    v-for="item in route_id_list"
                                     :key="item"
                                     :value="item">
                                     
@@ -159,14 +164,15 @@
             <Route 
                 ref="route" 
                 :tripform='form'
-                @refresh="refresh_trip">
+                @setRouteID="setRouteID">
             </Route>
         </el-tab-pane>
 
         <el-tab-pane label="Service Days">
             <Service 
                 ref="service" 
-                :tripform='form' >
+                :tripform='form' 
+                @setServiceID="setServiceID">
             </Service>
         </el-tab-pane>
 
@@ -195,15 +201,18 @@ import Service from '@/components/trip/Service'
 import Route from '@/components/trip/Route'
 import Stop from '@/components/trip/Stop'
 import Frenquencies from '@/components/trip/Frenquencies'
+import CreateTrip from '@/components/trip/CreateTrip'
     export default {
         components:{
             Service,
             Route,
             Stop,
             Frenquencies,
+            CreateTrip,
         },
         data(){
             return{
+                dialogFormVisible:false,
                 form:{
                     tripID:"",
                     shortName:"",
@@ -215,7 +224,8 @@ import Frenquencies from '@/components/trip/Frenquencies'
                     routeID:"",
                     serviceID:"",
                 },
-                route_list:"",
+               
+                directions:["one direction","opposite direction"]
 
 
             }
@@ -227,9 +237,15 @@ import Frenquencies from '@/components/trip/Frenquencies'
         },
        
         methods:{
-            
+            setdialogFormVisible(val){
+                this.dialogFormVisible = val;
+            },
 
-         
+            setServiceID(id){
+                this.form.tripID=id;
+                this.$emit("setTripID",id);
+                this.refresh_trip();
+            },
 
             //refresh the data in Trip according to the trip_id
             refresh_trip(){               
@@ -261,37 +277,33 @@ import Frenquencies from '@/components/trip/Frenquencies'
                 } 
             
             },
+            setRouteID(id){
+                this.form.routeID=id;
+            },
+            setServiceID(id){
+                this.form.serviceID=id;
+            },
+            setTripID(id){
+                this.form.tripID=id;
+                this.refresh_trip();
+            },
 
             //save all the changes in this page
             onSubmit() {
-                console.log('submit!');
-                this.$store.commit('setAttributeValue',["trips.txt","trip_id","AB1","trip_id","123123123"])
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"trip_short_name",this.form.shortName]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"trip_headsign",this.form.headSign]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"block_id",this.form.blockID]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"direction_id",this.form.direction]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"wheelchair_accessible",this.form.wheelchair]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"bikes_allowed",this.form.bikes]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"route_id",this.form.routeID]);
+                this.$store.commit('setAttributeValue',["trips.txt","trip_id",this.form.tripID,"service_id",this.form.serviceID]);
+                this.$message('already saved');
             },
 
 
         },
         watch:{
-
-            saved(val){              
-                if(val){  
-                    setTimeout(() => {
-                        var trip_id_list=this.$store.getters.getallAttribut("trips.txt","trip_id");
-                        this.$store.commit('setTrip_id_list',trip_id_list);                    
-                        
-                        var route_id_list=this.$store.getters.getallAttribut("routes.txt","route_id");
-                        this.route_list=route_id_list;
-                        this.$store.commit('setRoute_id_list',route_id_list);  
-                        
-                        var service_list=this.$store.getters.getallAttribut("calendar.txt","service_id");
-                        this.$store.commit('setService_list',service_list);   
-                    
-                        var stop_id_list=this.$store.getters.getallAttribut("stops.txt","stop_id");
-                        this.$store.commit('setStop_id_list',stop_id_list); 
-                    }, 100)  
-                }                  
-                
-            },
-
         },
 
         

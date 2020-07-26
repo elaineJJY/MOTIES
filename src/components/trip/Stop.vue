@@ -26,7 +26,7 @@
            </template>
        </el-table-column>
 
-        <el-table-column prop="pickup_type" label="Pickup" width="150">
+        <el-table-column prop="pickup_type" label="Pickup" width="140">
            <template slot-scope="scope">
                
                 <el-select 
@@ -43,7 +43,7 @@
            </template>
        </el-table-column>
 
-       <el-table-column prop="drop_off_type" label="Drop off" width="150">
+       <el-table-column prop="drop_off_type" label="Drop off" width="140">
            <template slot-scope="scope">
                 <el-select 
                     v-model="stopTimes[scope.$index].drop_off_type">
@@ -337,7 +337,7 @@ export default {
                 this.$store.commit("setRows",["stop_times.txt",temp.row,"stop_sequence",i]); 
             }
             this.$store.commit('deleteRows',["stop_times.txt",this.toDeletRows]);
-            
+            this.$message('already saved');
             this.refresh_stop();
         }
     },
