@@ -153,11 +153,9 @@
                     </el-row>
                 </el-form>
                 
-                <el-row>
-                    <el-col :offset="20">
-                        <el-button type="success" round @click="onSubmit">Submit</el-button>
-                    </el-col>
-                </el-row>
+                <div align="right">
+                    <el-button type="success" round @click="OnSubmit">Submit</el-button>
+                </div>
         </el-tab-pane>
 
         <el-tab-pane label="Route">

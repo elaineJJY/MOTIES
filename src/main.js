@@ -1,11 +1,3 @@
-/*
- * @Author: your name
- * @Date: 2020-06-15 16:26:17
- * @LastEditTime: 2020-06-30 22:21:13
- * @LastEditors: Please set LastEditors
- * @Description: In User Settings Edit
- * @FilePath: \moties_cli\src\main.js
- */ 
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
