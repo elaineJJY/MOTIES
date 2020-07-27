@@ -205,6 +205,9 @@ export default new Vuex.Store({
       //if this type does not exitst and we should add it to the txt
       var s="";
       if(attribute_position<0){
+        if(attributeValue==""){
+          return; //skip if input is empty
+        }
         fileAttributeType.push(attributtype); 
         for(var i in fileAttributeType){
           s+=fileAttributeType[i]+",";       

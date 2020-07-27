@@ -151,18 +151,14 @@
         
     </el-form>
 
-    <el-row>
-        <el-col :span="1" :offset="20" >
-                <el-button type="danger" plain @click="addNewStop">Add this Stop</el-button>
-        </el-col>
-    </el-row>
+    <div align="right">
+        <el-button type="danger" plain @click="addNewStop">Add this Stop</el-button>
+    </div>
     <br>
     <br>
-    <el-row>
-        <el-col :span="2" :offset="22">
-            <el-button type="success" round @click="onSubmit">Submit</el-button>
-        </el-col>
-    </el-row>
+    <div align="right">
+         <el-button type="success" round @click="OnSubmit">Submit</el-button>
+    </div>
      
      
 
@@ -206,9 +202,6 @@ export default {
         ...mapState(['GTFSmap','filenames','saved','trip_id_list','route_id_list','service_list']), //improt share variable from store
     },
     methods: {
-        test(){
-            console.log(this.stopTimes[0].pickup_type);
-        },
         deleteRow(index){
             var row=this.stopTimes[index].row;
             if(row<0){

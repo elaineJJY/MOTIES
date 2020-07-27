@@ -47,10 +47,9 @@
 </template>
 
 <script>
-import documentMenu from '@/components/document-menu'
 export default {
 components:{
-    documentMenu,
+    
   },
 data() {
     return {};

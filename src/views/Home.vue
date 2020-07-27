@@ -45,21 +45,31 @@
       
      
       
-      <el-main>
+      <el-main>  
+        <br>
+        <br> 
+        <el-row >
+          <el-col :offset="1" :span="7">
+            <el-upload
+              class="upload-demo"
+              action="1"
+              accept=".zip"
+              drag
+              :limit="1"
+              :before-upload="importUpload"
+              v-loading.fullscreen.lock="fullscreenLoading"
+              >
+              <i class="el-icon-upload"></i>
+              <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+              <div class="el-upload__tip" slot="tip">only zip file</div>
+            </el-upload>
+          </el-col>
+
+          <el-col :span="14">
+            <Agency ref="agency"></Agency>
+          </el-col>
+        </el-row>
         
-        <el-upload
-            class="upload-demo"
-            action="1"
-            accept=".zip"
-            drag
-            :limit="1"
-            :before-upload="importUpload"
-            v-loading.fullscreen.lock="fullscreenLoading"
-            >
-            <i class="el-icon-upload"></i>
-            <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
-            <div class="el-upload__tip" slot="tip">only zip file</div>
-          </el-upload>
       </el-main>
       
     </el-container>
@@ -70,9 +80,12 @@
 <script>
 import {mapState,mapMutations,mapActions,mapGetters} from 'vuex'
 import JsZip from 'jszip'; 
-
+import Agency from '@/components/agency'
 
 export default {
+  components:{
+    Agency,
+  },
   computed: {
     ...mapState(['GTFSmap','filenames','saved','zipsize']), //improt share variable from store
 
@@ -181,6 +194,7 @@ export default {
       
           var stop_id_list=this.$store.getters.getallAttribut("stops.txt","stop_id");
           this.$store.commit('setStop_id_list',stop_id_list); 
+          this.$refs.agency.refresh();
         }, 1000);
       }  
       
