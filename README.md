@@ -1,5 +1,6 @@
 # MOTIES
 MOTIES Project
+Sample Web-based GTFS Editor base on vue.js
 
 
 
